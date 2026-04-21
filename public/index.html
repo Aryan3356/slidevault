@@ -104,13 +104,13 @@
 <div id="page-upload" class="page">
   <div class="upload-page">
     <div class="upload-title">Upload Presentation</div>
-    <div class="upload-subtitle">Share your slides with students and professionals worldwide.</div>
+    <div class="upload-subtitle">Share your slides with students and with the professionals.</div>
 
     <div class="upload-dropzone" id="dropzone" onclick="document.getElementById('file-input').click()">
       <input type="file" id="file-input" class="drop-input" accept=".ppt,.pptx,.pdf,.key" onchange="handleFileSelect(this)">
       <div class="drop-icon">📊</div>
       <div class="drop-text">Drop your presentation here or <strong style="color:var(--accent)">browse files</strong></div>
-      <div class="drop-hint">Supports .pptx · .ppt · .pdf · .key — max 50MB</div>
+      <div class="drop-hint">Supports · .ppt · .pdf · .key — max 50MB</div>
       <div class="file-chosen" id="file-chosen">
         <span style="font-size:20px">📎</span>
         <span class="file-chosen-name" id="file-name"></span>
@@ -120,19 +120,19 @@
 
     <div class="form-grid">
       <div class="form-group full">
-        <label class="form-label">Presentation Title *</label>
-        <input type="text" class="form-input" id="f-title" placeholder="e.g. Introduction to Neural Networks">
+        <label class="form-label">Presentation Title</label>
+        <input type="text" class="form-input" id="f-title" placeholder="e.g Introduction to Algorithms">
       </div>
       <div class="form-group">
-        <label class="form-label">Your Name *</label>
-        <input type="text" class="form-input" id="f-author" placeholder="e.g. Dr. Ananya Sharma">
+        <label class="form-label">Your Name</label>
+        <input type="text" class="form-input" id="f-author" placeholder="Your Name">
       </div>
       <div class="form-group">
         <label class="form-label">Institution / Affiliation</label>
-        <input type="text" class="form-input" id="f-institution" placeholder="e.g. IIT Bombay">
+        <input type="text" class="form-input" id="f-institution" placeholder="Your Institution">
       </div>
       <div class="form-group">
-        <label class="form-label">Subject Category *</label>
+        <label class="form-label">Subject Category</label>
         <select class="form-select" id="f-category">
           <option value="">Select category...</option>
           <option value="cs">Computer Science</option>
