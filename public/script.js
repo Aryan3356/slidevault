@@ -662,33 +662,28 @@ function cardHTML(p) {
 }
 
 // ── CONFIRM DELETE ───────────────────────────────────────────
-function confirmDelete(id, title) {
-  // Show a confirmation dialog before deleting
-  const confirmed = window.confirm(
-    `⚠️ Delete "${title}"?\n\nThis action cannot be undone. The presentation will be permanently removed.`
-  );
-  if (confirmed) deletePresentation(id);
+function confirmDelete(id, name) {
+  if (confirm(`Are you sure you want to delete ${name}?`)) {
+    deletePresentation(id);
+  }
 }
 
-// ── DELETE PRESENTATION ──────────────────────────────────────
 async function deletePresentation(id) {
-  const token = getDeleteToken(id);
-  if (!token) {
-    showToast('You can only delete presentations you uploaded.', true);
-    return;
-  }
   try {
-    await apiFetch(`${API}/${id}`, {
-      method: 'DELETE',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ deleteToken: token }),
+    const response = await fetch(`/api/presentations/${id}`, {
+      method: 'DELETE'
     });
-    removeDeleteToken(id);       // clean up localStorage
-    showToast('Presentation deleted successfully 🗑️');
-    closeModal();
-    await renderCards();
-    await updateStats();
-  } catch(_) {}
+    
+    if (response.ok) {
+      alert('Presentation deleted successfully!');
+      location.reload(); // Refresh the page
+    } else {
+      alert('Delete failed. Please try again.');
+    }
+  } catch (error) {
+    console.error('Error:', error);
+    alert('Delete failed. Check your connection.');
+  }
 }
 
 // ── MODAL ────────────────────────────────────────────────────
