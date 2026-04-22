@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -36,8 +35,7 @@
           Academic & Professional Slide Repository
         </div>
         <h1>Discover &amp; Share<br><em>Great Presentations</em></h1>
-        <p>Upload, preview, and download presentation slides across every subject area.
-           Built for students, educators, and professionals.</p>
+        <p>Upload, preview, and download presentation slides across every subject area. Built for students, educators, and professionals.</p>
         <div class="hero-actions">
           <button class="btn-primary" onclick="showPage('upload')">↑ Upload Slides</button>
           <button class="btn-outline" onclick="document.getElementById('browse-section').scrollIntoView({behavior:'smooth'})">Browse Library</button>
@@ -104,13 +102,13 @@
 <div id="page-upload" class="page">
   <div class="upload-page">
     <div class="upload-title">Upload Presentation</div>
-    <div class="upload-subtitle">Share your slides with students and with the professionals.</div>
+    <div class="upload-subtitle">Share your slides with students and professionals worldwide.</div>
 
     <div class="upload-dropzone" id="dropzone" onclick="document.getElementById('file-input').click()">
       <input type="file" id="file-input" class="drop-input" accept=".ppt,.pptx,.pdf,.key" onchange="handleFileSelect(this)">
       <div class="drop-icon">📊</div>
       <div class="drop-text">Drop your presentation here or <strong style="color:var(--accent)">browse files</strong></div>
-      <div class="drop-hint">Supports · .ppt · .pdf · .key — max 50MB</div>
+      <div class="drop-hint">Supports .pptx · .ppt · .pdf · .key — max 50MB</div>
       <div class="file-chosen" id="file-chosen">
         <span style="font-size:20px">📎</span>
         <span class="file-chosen-name" id="file-name"></span>
@@ -121,18 +119,18 @@
     <div class="form-grid">
       <div class="form-group full">
         <label class="form-label">Presentation Title *</label>
-        <input type="text" class="form-input" id="f-title" placeholder="e.g Introduction to Algorithms">
+        <input type="text" class="form-input" id="f-title" placeholder="e.g. Introduction to Neural Networks">
       </div>
       <div class="form-group">
-        <label class="form-label">Your Name</label>
-        <input type="text" class="form-input" id="f-author" placeholder="Your Name">
+        <label class="form-label">Your Name *</label>
+        <input type="text" class="form-input" id="f-author" placeholder="e.g. Dr. Ananya Sharma">
       </div>
       <div class="form-group">
         <label class="form-label">Institution / Affiliation</label>
-        <input type="text" class="form-input" id="f-institution" placeholder="Your Institution">
+        <input type="text" class="form-input" id="f-institution" placeholder="e.g. IIT Bombay">
       </div>
       <div class="form-group">
-        <label class="form-label">Subject Category</label>
+        <label class="form-label">Subject Category *</label>
         <select class="form-select" id="f-category">
           <option value="">Select category...</option>
           <option value="cs">Computer Science</option>
@@ -210,6 +208,7 @@
       <div class="modal-actions">
         <button class="btn-download" id="m-dl-btn" onclick="downloadSlide()">⬇ Download Slides</button>
         <button class="btn-like" id="m-like-btn" onclick="toggleLike()">♡ Like</button>
+        <button class="btn-delete" id="m-delete-btn" onclick="confirmDelete(currentModalId,'this presentation')" style="display:none;">🗑 Delete</button>
         <button class="btn-outline" onclick="closeModal()" style="padding:11px 20px;font-size:13px;">Close</button>
       </div>
     </div>
