@@ -8,6 +8,163 @@
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=IBM+Plex+Mono:wght@300;400;500&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
 
+<!-- <script src="https://accounts.google.com/gsi/client" async defer></script> -->\
+
+<style>
+/* ═══════════════════════════════════════
+   LOGIN / SIGNUP MODAL STYLES
+═══════════════════════════════════════ */
+.auth-overlay {
+  display: none; position: fixed; inset: 0; z-index: 500;
+  background: rgba(26,23,20,0.8); backdrop-filter: blur(12px);
+  align-items: center; justify-content: center; padding: 20px;
+}
+.auth-overlay.open { display: flex; animation: fadeUp 0.3s ease; }
+
+.auth-box {
+  background: white; border-radius: 20px;
+  width: 100%; max-width: 440px;
+  box-shadow: 0 24px 80px rgba(0,0,0,0.25);
+  overflow: hidden;
+}
+
+/* Tab switcher */
+.auth-tabs {
+  display: flex; border-bottom: 1px solid var(--border);
+}
+.auth-tab {
+  flex: 1; padding: 18px; text-align: center;
+  font-family: 'IBM Plex Sans', sans-serif; font-size: 14px; font-weight: 600;
+  cursor: pointer; background: none; border: none;
+  color: var(--muted); transition: all 0.2s;
+  border-bottom: 3px solid transparent; margin-bottom: -1px;
+}
+.auth-tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+.auth-body { padding: 32px; }
+
+.auth-title {
+  font-family: 'Playfair Display', serif; font-weight: 700;
+  font-size: 1.5rem; color: var(--ink); margin-bottom: 6px;
+}
+.auth-subtitle { color: var(--muted); font-size: 13px; margin-bottom: 28px; }
+
+.auth-form { display: flex; flex-direction: column; gap: 16px; }
+
+.auth-field { display: flex; flex-direction: column; gap: 6px; }
+.auth-label {
+  font-size: 11px; font-weight: 600; color: var(--muted);
+  text-transform: uppercase; letter-spacing: 1px;
+  font-family: 'IBM Plex Mono', monospace;
+}
+.auth-input {
+  background: var(--surface2); border: 1.5px solid var(--border);
+  color: var(--ink); font-family: 'IBM Plex Sans', sans-serif;
+  font-size: 14px; padding: 11px 14px; border-radius: 10px;
+  outline: none; transition: all 0.2s; width: 100%;
+}
+.auth-input:focus { border-color: var(--accent); background: white; box-shadow: 0 0 0 3px rgba(200,75,47,0.08); }
+
+.auth-btn {
+  background: var(--accent); color: white;
+  font-family: 'IBM Plex Sans', sans-serif; font-weight: 700;
+  border: none; padding: 13px; border-radius: 10px;
+  cursor: pointer; font-size: 14px; transition: all 0.2s;
+  margin-top: 4px; width: 100%;
+}
+.auth-btn:hover { background: #b03d22; transform: translateY(-1px); box-shadow: 0 8px 24px rgba(200,75,47,0.25); }
+
+.auth-divider {
+  display: flex; align-items: center; gap: 12px;
+  color: var(--muted); font-size: 12px; margin: 4px 0;
+}
+.auth-divider::before, .auth-divider::after {
+  content: ''; flex: 1; height: 1px; background: var(--border);
+}
+
+.auth-google-btn {
+  background: white; color: var(--ink);
+  border: 1.5px solid var(--border); padding: 11px;
+  border-radius: 10px; cursor: pointer; font-size: 13px;
+  font-family: 'IBM Plex Sans', sans-serif; font-weight: 500;
+  transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 8px;
+  width: 100%;
+}
+.auth-google-btn:hover { border-color: var(--accent); background: rgba(200,75,47,0.03); }
+
+.auth-error {
+  background: #fef2f2; border: 1px solid #fca5a5;
+  border-radius: 8px; padding: 10px 14px;
+  color: #dc2626; font-size: 12px; display: none;
+}
+.auth-error.show { display: block; }
+
+.auth-close {
+  position: absolute; top: 16px; right: 16px;
+  background: var(--surface2); border: 1px solid var(--border);
+  color: var(--muted); width: 32px; height: 32px; border-radius: 8px;
+  cursor: pointer; font-size: 16px; display: grid; place-items: center;
+  transition: all 0.2s;
+}
+.auth-close:hover { color: var(--accent); border-color: var(--accent); }
+
+/* ── NAV USER SECTION ── */
+.nav-user { display: flex; align-items: center; gap: 10px; }
+
+.nav-login-btn {
+  background: none; border: 1.5px solid var(--border);
+  color: var(--ink); font-family: 'IBM Plex Sans', sans-serif;
+  font-size: 13px; font-weight: 500;
+  padding: 6px 16px; border-radius: 8px; cursor: pointer;
+  transition: all 0.2s;
+}
+.nav-login-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+/* Avatar + dropdown when logged in */
+.user-avatar-btn {
+  display: flex; align-items: center; gap: 8px;
+  background: none; border: 1.5px solid var(--border);
+  border-radius: 10px; padding: 5px 12px 5px 5px;
+  cursor: pointer; transition: all 0.2s; position: relative;
+}
+.user-avatar-btn:hover { border-color: var(--accent); }
+
+.user-avatar {
+  width: 28px; height: 28px; border-radius: 50%;
+  background: var(--accent); color: white;
+  display: grid; place-items: center;
+  font-family: 'Playfair Display', serif; font-weight: 700; font-size: 12px;
+}
+.user-name { font-size: 13px; font-weight: 500; color: var(--ink); max-width: 100px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+.user-dropdown {
+  display: none; position: absolute; top: calc(100% + 8px); right: 0;
+  background: white; border: 1px solid var(--border);
+  border-radius: 12px; padding: 8px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.12);
+  min-width: 180px; z-index: 200;
+}
+.user-dropdown.open { display: block; animation: fadeUp 0.2s ease; }
+
+.dropdown-item {
+  display: flex; align-items: center; gap: 8px;
+  padding: 9px 12px; border-radius: 8px; cursor: pointer;
+  font-size: 13px; color: var(--ink2); transition: all 0.15s;
+  background: none; border: none; width: 100%; text-align: left;
+  font-family: 'IBM Plex Sans', sans-serif;
+}
+.dropdown-item:hover { background: var(--surface2); color: var(--ink); }
+.dropdown-item.danger { color: #ef4444; }
+.dropdown-item.danger:hover { background: #fef2f2; }
+.dropdown-divider { height: 1px; background: var(--border); margin: 6px 0; }
+
+.user-email-display {
+  padding: 10px 12px 6px;
+  font-size: 11px; color: var(--muted);
+  font-family: 'IBM Plex Mono', monospace;
+  border-bottom: 1px solid var(--border); margin-bottom: 6px;
+}
+</style>
 </head>
 <body>
 
@@ -22,7 +179,27 @@
     <button class="nav-btn" onclick="showPage('categories')">Categories</button>
     <button class="nav-btn" onclick="showPage('upload')">Upload</button>
   </div>
-  <button class="nav-cta" onclick="showPage('upload')">↑ Upload Slides</button>
+
+  <!-- RIGHT SIDE: Login btn OR user avatar -->
+  <div class="nav-user">
+    <!-- Shown when NOT logged in -->
+    <button class="nav-login-btn" id="nav-login-btn" onclick="openAuth('login')">Log In</button>
+    <button class="nav-cta" onclick="handleUploadClick()">↑ Upload Slides</button>
+
+    <!-- Shown when logged in (hidden by default) -->
+    <div class="user-avatar-btn" id="user-avatar-btn" style="display:none;" onclick="toggleDropdown()">
+      <div class="user-avatar" id="user-avatar-initial">A</div>
+      <span class="user-name" id="user-name-display">User</span>
+      <span style="color:var(--muted);font-size:10px;">▼</span>
+      <div class="user-dropdown" id="user-dropdown">
+        <div class="user-email-display" id="user-email-display">user@email.com</div>
+        <button class="dropdown-item" onclick="showPage('upload');closeDropdown()">↑ Upload Slides</button>
+        <button class="dropdown-item" onclick="showMySlides();closeDropdown()">📊 My Presentations</button>
+        <div class="dropdown-divider"></div>
+        <button class="dropdown-item danger" onclick="logoutUser();closeDropdown()">→ Log Out</button>
+      </div>
+    </div>
+  </div>
 </nav>
 
 <!-- ══════════════ HOME PAGE ══════════════ -->
@@ -38,7 +215,7 @@
         <h1>Discover &amp; Share<br><em>Great Presentations</em></h1>
         <p>Upload, preview, and download presentation slides across every subject area. Built for students, educators, and professionals.</p>
         <div class="hero-actions">
-          <button class="btn-primary" onclick="showPage('upload')">↑ Upload Slides</button>
+          <button class="btn-primary" onclick="handleUploadClick()">↑ Upload Slides</button>
           <button class="btn-outline" onclick="document.getElementById('browse-section').scrollIntoView({behavior:'smooth'})">Browse Library</button>
         </div>
         <div class="stats-strip">
@@ -53,17 +230,14 @@
 
   <div class="container" id="browse-section">
     <div class="section">
-      <!-- Trending -->
       <div class="trending-bar">
         <div class="trending-label">🔥 Trending Now</div>
         <div class="trending-items" id="trending-items"></div>
       </div>
-
-      <!-- Toolbar -->
       <div class="toolbar">
         <div class="search-wrap">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--muted);flex-shrink:0"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-          <input type="text" id="search-input" placeholder="Search by title, author, or topic..." oninput="renderCards()">
+          <input type="text" id="search-input" placeholder="Search by title, author, or topic...">
         </div>
         <select class="select-filter" id="sort-select" onchange="renderCards()">
           <option value="recent">Most Recent</option>
@@ -73,7 +247,6 @@
         </select>
       </div>
       <div class="cat-pills" id="cat-pills"></div>
-
       <div class="sec-head">
         <div class="sec-title">Presentations</div>
         <div class="sec-count" id="result-count"></div>
@@ -104,7 +277,6 @@
   <div class="upload-page">
     <div class="upload-title">Upload Presentation</div>
     <div class="upload-subtitle">Share your slides with students and professionals worldwide.</div>
-
     <div class="upload-dropzone" id="dropzone" onclick="document.getElementById('file-input').click()">
       <input type="file" id="file-input" class="drop-input" accept=".ppt,.pptx,.pdf,.key" onchange="handleFileSelect(this)">
       <div class="drop-icon">📊</div>
@@ -116,7 +288,6 @@
         <span class="file-chosen-size" id="file-size"></span>
       </div>
     </div>
-
     <div class="form-grid">
       <div class="form-group full">
         <label class="form-label">Presentation Title *</label>
@@ -128,7 +299,7 @@
       </div>
       <div class="form-group">
         <label class="form-label">Institution / Affiliation</label>
-        <input type="text" class="form-input" id="f-institution" placeholder="Name of Institution">
+        <input type="text" class="form-input" id="f-institution" placeholder="Your Institution">
       </div>
       <div class="form-group">
         <label class="form-label">Subject Category *</label>
@@ -168,7 +339,7 @@
       </div>
       <div class="form-group full">
         <label class="form-label">Tags (press Enter to add)</label>
-        <div style="background:white;border:1px solid var(--border);border-radius:10px;padding:8px 12px;transition:border-color 0.2s;" id="tags-container" onclick="document.getElementById('tag-input').focus()">
+        <div style="background:white;border:1px solid var(--border);border-radius:10px;padding:8px 12px;" id="tags-container" onclick="document.getElementById('tag-input').focus()">
           <div class="tags-input" id="tags-list">
             <input type="text" id="tag-input" class="tag-add-input" placeholder="Add tag..." onkeydown="handleTagKey(event)">
           </div>
@@ -191,8 +362,6 @@
       </div>
       <button class="modal-close" onclick="closeModal()">✕</button>
     </div>
-
-    <!-- Slide Viewer -->
     <div class="slide-viewer">
       <div class="slide-display" id="slide-display"></div>
       <div class="slide-nav">
@@ -202,14 +371,89 @@
       </div>
       <div class="slide-dots" id="slide-dots"></div>
     </div>
-
     <div class="modal-bottom">
       <div class="modal-meta-row" id="m-meta"></div>
       <div class="modal-desc" id="m-desc"></div>
       <div class="modal-actions">
         <button class="btn-download" id="m-dl-btn" onclick="downloadSlide()">⬇ Download Slides</button>
         <button class="btn-like" id="m-like-btn" onclick="toggleLike()">♡ Like</button>
+        <button class="btn-delete" id="m-delete-btn" onclick="confirmDelete(currentModalId,'this presentation')" style="display:none;">🗑 Delete</button>
         <button class="btn-outline" onclick="closeModal()" style="padding:11px 20px;font-size:13px;">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════ AUTH MODAL ══════════════ -->
+<div class="auth-overlay" id="auth-overlay" onclick="handleAuthOverlayClick(event)">
+  <div class="auth-box" style="position:relative;">
+    <button class="auth-close" onclick="closeAuth()">✕</button>
+
+    <!-- Tabs -->
+    <div class="auth-tabs">
+      <button class="auth-tab active" id="tab-login" onclick="switchAuthTab('login')">Log In</button>
+      <button class="auth-tab" id="tab-signup" onclick="switchAuthTab('signup')">Sign Up</button>
+    </div>
+
+    <!-- LOGIN FORM -->
+    <div class="auth-body" id="auth-login-body">
+      <div class="auth-title">Welcome back 👋</div>
+      <div class="auth-subtitle">Log in to upload and manage your presentations.</div>
+      <div class="auth-error" id="login-error"></div>
+      <div class="auth-form">
+        <div class="auth-field">
+          <label class="auth-label">Email</label>
+          <input type="email" class="auth-input" id="login-email" placeholder="you@gmail.com">
+        </div>
+        <div class="auth-field">
+          <label class="auth-label">Password</label>
+          <input type="password" class="auth-input" id="login-password" placeholder="••••••••" onkeydown="if(event.key==='Enter')loginUser()">
+        </div>
+        <button class="auth-btn" onclick="loginUser()">Log In →</button>
+        <div class="auth-divider">or</div>
+        <button class="auth-google-btn" onclick="googleSignIn()">
+          <svg width="18" height="18" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.5 0 6.6 1.2 9 3.2l6.7-6.7C35.6 2.4 30.1 0 24 0 14.6 0 6.6 5.4 2.6 13.3l7.8 6C12.2 13.2 17.6 9.5 24 9.5z"/>
+            <path fill="#4285F4" d="M46.5 24.5c0-1.6-.1-3.1-.4-4.5H24v8.5h12.7c-.6 3-2.3 5.5-4.8 7.2l7.5 5.8c4.4-4.1 7.1-10.1 7.1-17z"/><path fill="#FBBC05" d="M10.4 28.7A14.5 14.5 0 0 1 9.5 24c0-1.6.3-3.2.8-4.7l-7.8-6A24 24 0 0 0 0 24c0 3.9.9 7.5 2.6 10.7l7.8-6z"/>
+            <path fill="#34A853" d="M24 48c6.1 0 11.2-2 14.9-5.4l-7.5-5.8c-2 1.4-4.6 2.2-7.4 2.2-6.4 0-11.8-3.7-13.6-9l-7.8 6C6.6 42.6 14.6 48 24 48z"/></svg>
+          Continue with Google
+        </button>
+        <div style="text-align:center;font-size:12px;color:var(--muted);">
+          No account? <span style="color:var(--accent);cursor:pointer;font-weight:600;" onclick="switchAuthTab('signup')">Sign up free →</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- SIGNUP FORM -->
+    <div class="auth-body" id="auth-signup-body" style="display:none;">
+      <div class="auth-title">Join SlideVault ✨</div>
+      <div class="auth-subtitle">Create an account to start sharing your presentations.</div>
+      <div class="auth-error" id="signup-error"></div>
+      <div class="auth-form">
+        <div class="auth-field">
+          <label class="auth-label">Full Name</label>
+          <input type="text" class="auth-input" id="signup-name" placeholder="Your Name">
+        </div>
+        <div class="auth-field">
+          <label class="auth-label">Email</label>
+          <input type="email" class="auth-input" id="signup-email" placeholder="you@gmail.com">
+        </div>
+        <div class="auth-field">
+          <label class="auth-label">Password</label>
+          <input type="password" class="auth-input" id="signup-password" placeholder="Min 6 characters" onkeydown="if(event.key==='Enter')signupUser()">
+        </div>
+        <div class="auth-field">
+          <label class="auth-label">Confirm Password</label>
+          <input type="password" class="auth-input" id="signup-confirm" placeholder="Repeat password" onkeydown="if(event.key==='Enter')signupUser()">
+        </div>
+        <button class="auth-btn" onclick="signupUser()">Create Account →</button>
+        <div class="auth-divider">or</div>
+        <button class="auth-google-btn" onclick="googleSignIn()">
+          <svg width="18" height="18" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.5 0 6.6 1.2 9 3.2l6.7-6.7C35.6 2.4 30.1 0 24 0 14.6 0 6.6 5.4 2.6 13.3l7.8 6C12.2 13.2 17.6 9.5 24 9.5z"/><path fill="#4285F4" d="M46.5 24.5c0-1.6-.1-3.1-.4-4.5H24v8.5h12.7c-.6 3-2.3 5.5-4.8 7.2l7.5 5.8c4.4-4.1 7.1-10.1 7.1-17z"/><path fill="#FBBC05" d="M10.4 28.7A14.5 14.5 0 0 1 9.5 24c0-1.6.3-3.2.8-4.7l-7.8-6A24 24 0 0 0 0 24c0 3.9.9 7.5 2.6 10.7l7.8-6z"/><path fill="#34A853" d="M24 48c6.1 0 11.2-2 14.9-5.4l-7.5-5.8c-2 1.4-4.6 2.2-7.4 2.2-6.4 0-11.8-3.7-13.6-9l-7.8 6C6.6 42.6 14.6 48 24 48z"/></svg>
+          Continue with Google
+        </button>
+        <div style="text-align:center;font-size:12px;color:var(--muted);">
+          Already have an account? <span style="color:var(--accent);cursor:pointer;font-weight:600;" onclick="switchAuthTab('login')">Log in →</span>
+        </div>
       </div>
     </div>
   </div>
@@ -222,6 +466,164 @@
 </div>
 
 <script src="script.js"></script>
+<script>
+// ═══════════════════════════════════════════════
+//  AUTH SYSTEM  (frontend-only, localStorage)
+//  For real projects: connect to backend JWT auth
+// ═══════════════════════════════════════════════
 
+// Load existing users and current session from localStorage
+let users    = JSON.parse(localStorage.getItem('sv_users') || '[]');
+let authUser = JSON.parse(localStorage.getItem('sv_auth_user') || 'null');
+
+// Run auth UI on page load
+window.addEventListener('DOMContentLoaded', () => {
+  if (authUser) updateNavForLoggedIn(authUser);
+  else          updateNavForLoggedOut();
+});
+
+// ── Open / Close Auth Modal ──────────────────────
+function openAuth(tab = 'login') {
+  document.getElementById('auth-overlay').classList.add('open');
+  switchAuthTab(tab);
+  document.body.style.overflow = 'hidden';
+  setTimeout(() => document.getElementById(tab === 'login' ? 'login-email' : 'signup-name').focus(), 100);
+}
+
+function closeAuth() {
+  document.getElementById('auth-overlay').classList.remove('open');
+  document.body.style.overflow = '';
+  clearAuthErrors();
+}
+
+function handleAuthOverlayClick(e) {
+  if (e.target === document.getElementById('auth-overlay')) closeAuth();
+}
+
+// ── Tab Switcher ─────────────────────────────────
+function switchAuthTab(tab) {
+  document.getElementById('tab-login').classList.toggle('active',  tab === 'login');
+  document.getElementById('tab-signup').classList.toggle('active', tab === 'signup');
+  document.getElementById('auth-login-body').style.display  = tab === 'login'  ? 'block' : 'none';
+  document.getElementById('auth-signup-body').style.display = tab === 'signup' ? 'block' : 'none';
+  clearAuthErrors();
+}
+
+function clearAuthErrors() {
+  document.getElementById('login-error').classList.remove('show');
+  document.getElementById('signup-error').classList.remove('show');
+}
+
+function showAuthError(id, msg) {
+  const el = document.getElementById(id);
+  el.textContent = msg;
+  el.classList.add('show');
+}
+
+// ── LOGIN ────────────────────────────────────────
+function loginUser() {
+  const email    = document.getElementById('login-email').value.trim().toLowerCase();
+  const password = document.getElementById('login-password').value;
+
+  if (!email || !password) { showAuthError('login-error', 'Please fill in all fields.'); return; }
+
+  const user = users.find(u => u.email === email && u.password === btoa(password));
+  if (!user) { showAuthError('login-error', 'Incorrect email or password.'); return; }
+
+  setLoggedIn(user);
+}
+
+// ── SIGNUP ───────────────────────────────────────
+function signupUser() {
+  const name     = document.getElementById('signup-name').value.trim();
+  const email    = document.getElementById('signup-email').value.trim().toLowerCase();
+  const password = document.getElementById('signup-password').value;
+  const confirm  = document.getElementById('signup-confirm').value;
+
+  if (!name || !email || !password) { showAuthError('signup-error', 'Please fill in all fields.'); return; }
+  if (password.length < 6)          { showAuthError('signup-error', 'Password must be at least 6 characters.'); return; }
+  if (password !== confirm)         { showAuthError('signup-error', 'Passwords do not match.'); return; }
+  if (users.find(u => u.email === email)) { showAuthError('signup-error', 'An account with this email already exists.'); return; }
+
+  const newUser = { id: Date.now(), name, email, password: btoa(password), createdAt: new Date().toISOString() };
+  users.push(newUser);
+  localStorage.setItem('sv_users', JSON.stringify(users));
+  setLoggedIn(newUser);
+}
+
+// ── GOOGLE SIGN IN (simulated for demo) ─────────
+function googleSignIn() {
+  const name  = prompt('Enter your name (Google Sign-In demo):');
+  const email = prompt('Enter your email:');
+  if (!name || !email) return;
+
+  let user = users.find(u => u.email === email.toLowerCase());
+  if (!user) {
+    user = { id: Date.now(), name, email: email.toLowerCase(), password: '', createdAt: new Date().toISOString() };
+    users.push(user);
+    localStorage.setItem('sv_users', JSON.stringify(users));
+  }
+  setLoggedIn(user);
+}
+
+// ── Set session ──────────────────────────────────
+function setLoggedIn(user) {
+  authUser = { id: user.id, name: user.name, email: user.email };
+  localStorage.setItem('sv_auth_user', JSON.stringify(authUser));
+  updateNavForLoggedIn(authUser);
+  closeAuth();
+  showToast(`Welcome back, ${user.name.split(' ')[0]}! 👋`);
+}
+
+// ── LOGOUT ───────────────────────────────────────
+function logoutUser() {
+  authUser = null;
+  localStorage.removeItem('sv_auth_user');
+  updateNavForLoggedOut();
+  showToast('You have been logged out.');
+}
+
+// ── Update NAV UI ────────────────────────────────
+function updateNavForLoggedIn(user) {
+  document.getElementById('nav-login-btn').style.display    = 'none';
+  document.getElementById('user-avatar-btn').style.display  = 'flex';
+  document.getElementById('user-avatar-initial').textContent = user.name ? user.name[0].toUpperCase() : 'U';
+  document.getElementById('user-name-display').textContent  = user.name.split(' ')[0];
+  document.getElementById('user-email-display').textContent = user.email;
+}
+
+function updateNavForLoggedOut() {
+  document.getElementById('nav-login-btn').style.display   = 'inline-flex';
+  document.getElementById('user-avatar-btn').style.display = 'none';
+}
+
+// ── Dropdown toggle ──────────────────────────────
+function toggleDropdown() {
+  document.getElementById('user-dropdown').classList.toggle('open');
+}
+function closeDropdown() {
+  document.getElementById('user-dropdown').classList.remove('open');
+}
+document.addEventListener('click', e => {
+  if (!e.target.closest('.user-avatar-btn')) closeDropdown();
+});
+
+// ── Upload button: require login ─────────────────
+function handleUploadClick() {
+  if (!authUser) {
+    openAuth('login');
+    showToast('Please log in to upload presentations 🔐', true);
+  } else {
+    showPage('upload');
+  }
+}
+
+// ── My Presentations filter ──────────────────────
+function showMySlides() {
+  showPage('home');
+  showToast('Showing your uploaded presentations');
+  setTimeout(() => document.getElementById('browse-section').scrollIntoView({behavior:'smooth'}), 300);
+}
+</script>
 </body>
 </html>

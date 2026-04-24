@@ -126,6 +126,158 @@ function renderTrending() {
   ).join('');
 }
 
+let users    = JSON.parse(localStorage.getItem('sv_users') || '[]');
+let authUser = JSON.parse(localStorage.getItem('sv_auth_user') || 'null');
+
+// Run auth UI on page load
+window.addEventListener('DOMContentLoaded', () => {
+  if (authUser) updateNavForLoggedIn(authUser);
+  else          updateNavForLoggedOut();
+});
+
+// ── Open / Close Auth Modal ──────────────────────
+function openAuth(tab = 'login') {
+  document.getElementById('auth-overlay').classList.add('open');
+  switchAuthTab(tab);
+  document.body.style.overflow = 'hidden';
+  setTimeout(() => document.getElementById(tab === 'login' ? 'login-email' : 'signup-name').focus(), 100);
+}
+
+function closeAuth() {
+  document.getElementById('auth-overlay').classList.remove('open');
+  document.body.style.overflow = '';
+  clearAuthErrors();
+}
+
+function handleAuthOverlayClick(e) {
+  if (e.target === document.getElementById('auth-overlay')) closeAuth();
+}
+
+// ── Tab Switcher ─────────────────────────────────
+function switchAuthTab(tab) {
+  document.getElementById('tab-login').classList.toggle('active',  tab === 'login');
+  document.getElementById('tab-signup').classList.toggle('active', tab === 'signup');
+  document.getElementById('auth-login-body').style.display  = tab === 'login'  ? 'block' : 'none';
+  document.getElementById('auth-signup-body').style.display = tab === 'signup' ? 'block' : 'none';
+  clearAuthErrors();
+}
+
+function clearAuthErrors() {
+  document.getElementById('login-error').classList.remove('show');
+  document.getElementById('signup-error').classList.remove('show');
+}
+
+function showAuthError(id, msg) {
+  const el = document.getElementById(id);
+  el.textContent = msg;
+  el.classList.add('show');
+}
+
+// ── LOGIN ────────────────────────────────────────
+function loginUser() {
+  const email    = document.getElementById('login-email').value.trim().toLowerCase();
+  const password = document.getElementById('login-password').value;
+
+  if (!email || !password) { showAuthError('login-error', 'Please fill in all fields.'); return; }
+
+  const user = users.find(u => u.email === email && u.password === btoa(password));
+  if (!user) { showAuthError('login-error', 'Incorrect email or password.'); return; }
+
+  setLoggedIn(user);
+}
+
+// ── SIGNUP ───────────────────────────────────────
+function signupUser() {
+  const name     = document.getElementById('signup-name').value.trim();
+  const email    = document.getElementById('signup-email').value.trim().toLowerCase();
+  const password = document.getElementById('signup-password').value;
+  const confirm  = document.getElementById('signup-confirm').value;
+
+  if (!name || !email || !password) { showAuthError('signup-error', 'Please fill in all fields.'); return; }
+  if (password.length < 6)          { showAuthError('signup-error', 'Password must be at least 6 characters.'); return; }
+  if (password !== confirm)         { showAuthError('signup-error', 'Passwords do not match.'); return; }
+  if (users.find(u => u.email === email)) { showAuthError('signup-error', 'An account with this email already exists.'); return; }
+
+  const newUser = { id: Date.now(), name, email, password: btoa(password), createdAt: new Date().toISOString() };
+  users.push(newUser);
+  localStorage.setItem('sv_users', JSON.stringify(users));
+  setLoggedIn(newUser);
+}
+
+// ── GOOGLE SIGN IN (simulated for demo) ─────────
+function googleSignIn() {
+  const name  = prompt('Enter your name (Google Sign-In demo):');
+  const email = prompt('Enter your email:');
+  if (!name || !email) return;
+
+  let user = users.find(u => u.email === email.toLowerCase());
+  if (!user) {
+    user = { id: Date.now(), name, email: email.toLowerCase(), password: '', createdAt: new Date().toISOString() };
+    users.push(user);
+    localStorage.setItem('sv_users', JSON.stringify(users));
+  }
+  setLoggedIn(user);
+}
+
+// ── Set session ──────────────────────────────────
+function setLoggedIn(user) {
+  authUser = { id: user.id, name: user.name, email: user.email };
+  localStorage.setItem('sv_auth_user', JSON.stringify(authUser));
+  updateNavForLoggedIn(authUser);
+  closeAuth();
+  showToast(`Welcome back, ${user.name.split(' ')[0]}! 👋`);
+}
+
+// ── LOGOUT ───────────────────────────────────────
+function logoutUser() {
+  authUser = null;
+  localStorage.removeItem('sv_auth_user');
+  updateNavForLoggedOut();
+  showToast('You have been logged out.');
+}
+
+// ── Update NAV UI ────────────────────────────────
+function updateNavForLoggedIn(user) {
+  document.getElementById('nav-login-btn').style.display    = 'none';
+  document.getElementById('user-avatar-btn').style.display  = 'flex';
+  document.getElementById('user-avatar-initial').textContent = user.name ? user.name[0].toUpperCase() : 'U';
+  document.getElementById('user-name-display').textContent  = user.name.split(' ')[0];
+  document.getElementById('user-email-display').textContent = user.email;
+}
+
+function updateNavForLoggedOut() {
+  document.getElementById('nav-login-btn').style.display   = 'inline-flex';
+  document.getElementById('user-avatar-btn').style.display = 'none';
+}
+
+// ── Dropdown toggle ──────────────────────────────
+function toggleDropdown() {
+  document.getElementById('user-dropdown').classList.toggle('open');
+}
+function closeDropdown() {
+  document.getElementById('user-dropdown').classList.remove('open');
+}
+document.addEventListener('click', e => {
+  if (!e.target.closest('.user-avatar-btn')) closeDropdown();
+});
+
+// ── Upload button: require login ─────────────────
+function handleUploadClick() {
+  if (!authUser) {
+    openAuth('login');
+    showToast('Please log in to upload presentations 🔐', true);
+  } else {
+    showPage('upload');
+  }
+}
+
+// ── My Presentations filter ──────────────────────
+function showMySlides() {
+  showPage('home');
+  showToast('Showing your uploaded presentations');
+  setTimeout(() => document.getElementById('browse-section').scrollIntoView({behavior:'smooth'}), 300);
+}
+
 // ── Render cards grid ────────────────────────────────────────
 async function renderCards() {
   const search = (document.getElementById('search-input')?.value || '').trim();

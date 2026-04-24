@@ -10,6 +10,9 @@ const multer       = require('multer');
 const fs           = require('fs');
 const Presentation = require('./models/Presentation');
 
+// const jwt = require('jsonwebtoken');
+// const { OAuth2Client } = require('google-auth-library');
+
 const app  = express();
 const PORT = process.env.PORT || 3000;
 
@@ -57,6 +60,23 @@ mongoose
     process.exit(1);
   });
 
+//   // ============================================================
+// //  USER MODEL (for Google OAuth)
+// // ============================================================
+// const UserSchema = new mongoose.Schema({
+//   email: { type: String, required: true, unique: true },
+//   name: { type: String, required: true },
+//   googleId: { type: String },
+//   picture: { type: String },
+//   password: { type: String }, // Empty for Google users
+//   createdAt: { type: Date, default: Date.now }
+// });
+
+// const User = mongoose.model('User', UserSchema);
+
+// // JWT Secret
+// const JWT_SECRET = process.env.JWT_SECRET || 'slidevault-secret-key-change-this';
+
 // ── Seed data (runs only when DB is empty) ────────────────────
 async function seedDatabase() {
   const count = await Presentation.countDocuments();
@@ -70,7 +90,7 @@ async function seedDatabase() {
     { title:'Startup Strategy & Business Model Canvas', author:'Kavya Mittal', institution:'IIM Ahmedabad', cat:'business', desc:'How to design and validate a startup business model. Covers BMC, customer discovery, MVP, and go-to-market strategy.', tags:['Startup','BMC','Strategy','MVP'], slideCount:28, downloads:403, views:1021, likes:87 },
     { title:'CRISPR & Gene Editing Technologies', author:'Dr. Meera Sharma', institution:'AIIMS Delhi', cat:'biology', desc:'Mechanism of CRISPR-Cas9, therapeutic applications, ethical considerations, and current clinical trials overview.', tags:['CRISPR','Genetics','Biotechnology'], slideCount:36, downloads:156, views:489, likes:52 },
     { title:'Operating Systems — Process & Memory Management', author:'Dr. Sachin Chawla', institution:'NIT Jalandhar', cat:'cs', desc:'Process scheduling algorithms, memory management techniques, virtual memory, page replacement algorithms with diagrams.', tags:['OS','Scheduling','Virtual Memory','Paging'], slideCount:47, downloads:534, views:1342, likes:101 },
-    { title:'UI/UX Design Principles & Figma Workflow', author:'Sneha Patel', institution:'NID Ahmedabad', cat:'design', desc:'Foundational design principles, Figma prototyping workflow, accessibility standards, and real-world case studies from top products.', tags:['Figma','UX Research','Prototyping','Accessibility'], slideCount:41, downloads:289, views:732, likes:75 },
+    { title:'UI/UX Design Principles & Figma Workflow', author:'Dr. Akash Pundir', institution:'Lovely Professional University, Punjab', cat:'design', desc:'Foundational design principles, Figma prototyping workflow, accessibility standards, and real-world case studies from top products.', tags:['Figma','UX Research','Prototyping','Accessibility'], slideCount:41, downloads:289, views:732, likes:75 },
     { title:'Linear Algebra — Vectors, Matrices & Transformations', author:'Dr. Jyoti Ranjan Yadav', institution:'IIT Kanpur', cat:'math', desc:'Core linear algebra concepts essential for ML and engineering. Eigen vectors, matrix decomposition, and geometric interpretations.', tags:['Linear Algebra','Eigenvalues','SVD','ML Math'], slideCount:35, downloads:261, views:698, likes:58 },
     { title:'Computer Networks & TCP/IP Stack', author:'Dr. Tanvi Mittal', institution:'IIT Delhi', cat:'cs', desc:'OSI model, TCP/IP protocols, routing algorithms, HTTP/HTTPS, DNS, and security. Includes Wireshark demo slides.', tags:['Networking','TCP/IP','HTTP','Security'], slideCount:52, downloads:378, views:945, likes:79 },
     { title:'Behavioral Economics & Decision Making', author:'Dr. Rohan Joshi', institution:'Bits Pilani', cat:'social', desc:'How cognitive biases affect economic decisions. Covers prospect theory, nudge theory, and applications in public policy and marketing.', tags:['Behavioral Econ','Bias','Nudge Theory'], slideCount:30, downloads:167, views:521, likes:44 },
@@ -215,6 +235,74 @@ app.delete('/api/presentations/:id', async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
+
+// // ============================================================
+// //  GOOGLE OAUTH VERIFICATION
+// // ============================================================
+// // const { OAuth2Client } = require('google-auth-library');
+
+// // Your Google Client ID from the popup
+// const GOOGLE_CLIENT_ID = '340108302943-2k8of0s6685v3pr1ml0rdr6vf7oeia.apps.googleusercontent.com';
+// const googleClient = new OAuth2Client(GOOGLE_CLIENT_ID);
+
+// // ── POST /api/auth/google ── Verify Google token and login/register
+// app.post('/api/auth/google', async (req, res) => {
+//   const { token } = req.body;
+  
+//   if (!token) {
+//     return res.status(400).json({ error: 'No token provided' });
+//   }
+  
+//   try {
+//     // Verify the Google ID token
+//     const ticket = await googleClient.verifyIdToken({
+//       idToken: token,
+//       audience: GOOGLE_CLIENT_ID
+//     });
+    
+//     const payload = ticket.getPayload();
+//     const { email, name, sub: googleId, picture } = payload;
+    
+//     // Check if user exists in your database
+//     let user = await User.findOne({ email });
+    
+//     if (!user) {
+//       // Create new user if doesn't exist
+//       user = new User({
+//         email,
+//         name: name || email.split('@')[0],
+//         googleId,
+//         picture,
+//         password: '', // No password for Google users
+//         createdAt: new Date()
+//       });
+//       await user.save();
+//       console.log(`🆕 New Google user created: ${email}`);
+//     }
+    
+//     // Create a session token (JWT) for your app
+//     const jwtToken = jwt.sign(
+//       { userId: user._id, email: user.email, name: user.name },
+//       JWT_SECRET,
+//       { expiresIn: '7d' }
+//     );
+    
+//     res.json({
+//       success: true,
+//       token: jwtToken,
+//       user: {
+//         id: user._id,
+//         name: user.name,
+//         email: user.email,
+//         picture: user.picture
+//       }
+//     });
+    
+//   } catch (error) {
+//     console.error('Google verification failed:', error);
+//     res.status(401).json({ error: 'Invalid Google token' });
+//   }
+// });
 
 // ── Catch-all: return index.html for all other routes ────────
 // ── Catch-all: return index.html for all other routes ────────
