@@ -104,6 +104,14 @@ async function seedDatabase() {
 // ═══════════════════════════════════════════════════════════
 
 // ── GET /api/stats ── platform totals
+app.get('/health', (req, res) => {
+  res.json({
+    ok: true,
+    uptime: process.uptime(),
+    mongo: mongoose.connection.readyState === 1 ? 'connected' : 'disconnected',
+  });
+});
+
 app.get('/api/stats', async (req, res) => {
   try {
     const [total, dlAgg, viewAgg] = await Promise.all([
