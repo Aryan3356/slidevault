@@ -14,7 +14,7 @@ const CATS = {
   design:      { label:'Design & Arts',           emoji:'🎨', color:'#db2777', bg:'rgba(219,39,119,0.08)',  tags:['UI/UX','Typography','Motion','Illustration'] },
 };
 
-// ── Slide preview HTML templates (generated in browser) ─────
+// ── Slide preview HTML templates
 function genSlides(title, cat, count) {
   const c = CATS[cat] || CATS.cs;
   const layouts = [
@@ -26,7 +26,7 @@ function genSlides(title, cat, count) {
   return Array.from({length:count},(_,i)=>({ html: layouts[i%layouts.length](i, i===0?title:`${title} — Part ${i+1}`, c) }));
 }
 
-// ── API helper ───────────────────────────────────────────────
+// ── API helper ────────────────────
 const API = '/api/presentations';
 
 async function apiFetch(url, opts = {}) {

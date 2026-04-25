@@ -1,4 +1,5 @@
 {
+  "$schema": "https://json.schemastore.org/package.json",
   "name": "slidevault",
   "version": "1.0.0",
   "description": "Presentation slides upload & management platform with MongoDB",
